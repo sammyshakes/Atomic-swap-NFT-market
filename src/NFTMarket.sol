@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 /**
  * @title NFTMarket
  * @notice A contract for listing and purchasing NFTs with a market fee
+ * @dev Supports listing, purchasing, and canceling NFT listings
  */
 contract NFTMarket is Ownable {
     struct Listing {
@@ -18,6 +19,7 @@ contract NFTMarket is Ownable {
     }
 
     mapping(uint256 => Listing) public listings;
+    mapping(address => uint256[]) public userTransactions;
     uint256 public nextListingId = 0;
     uint256 public marketFeePercent; // Market fee as a percentage
     uint256 public collectedFees; // Total collected fees
@@ -67,6 +69,7 @@ contract NFTMarket is Ownable {
 
         uint256 listingId = nextListingId++;
         listings[listingId] = Listing(nftContract, tokenId, price, msg.sender, true);
+
         // Transferring the NFT to the contract's custody until purchase
         IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
 
@@ -92,6 +95,10 @@ contract NFTMarket is Ownable {
         // Prevent reentrancy by setting isForSale to false before any external calls
         listing.isForSale = false;
         listings[listingId] = listing;
+
+        // Add the listing to the users' transactions
+        userTransactions[msg.sender].push(listingId);
+        userTransactions[listings[listingId].seller].push(listingId);
 
         // Transfer the NFT to the buyer
         IERC721(listing.nftContract).transferFrom(address(this), msg.sender, listing.tokenId);
@@ -147,6 +154,15 @@ contract NFTMarket is Ownable {
      */
     function getListing(uint256 listingId) external view returns (Listing memory) {
         return listings[listingId];
+    }
+
+    /**
+     * @notice Retrieve all listings for a given user
+     * @param user The address of the user
+     * @return An array of listing IDs
+     */
+    function getUserTransactions(address user) external view returns (uint256[] memory) {
+        return userTransactions[user];
     }
 
     receive() external payable {}

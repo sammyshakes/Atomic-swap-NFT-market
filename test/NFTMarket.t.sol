@@ -164,4 +164,30 @@ contract TestNFTMarket is Test {
         (,,,, bool isForSale) = market.listings(0);
         assertFalse(isForSale, "Should be delisted");
     }
+
+    function testGetUserTransactions() public {
+        uint256 listingPrice = 10 ether;
+
+        // User1 lists the token
+        vm.startPrank(user1);
+        token.approve(address(market), tokenId);
+        market.listNFT(address(token), tokenId, listingPrice);
+        vm.stopPrank();
+
+        // User2 fulfills the listing
+        vm.prank(user2);
+        market.fulfillListing{value: listingPrice}(0);
+
+        // Get the transactions for user1
+        uint256[] memory user1Transactions = market.getUserTransactions(user1);
+
+        // Check that there's only one transaction for user1
+        assertEq(user1Transactions.length, 1, "User1 should have one transaction");
+
+        // Get the transactions for user2
+        uint256[] memory user2Transactions = market.getUserTransactions(user2);
+
+        // Check that there's only one transaction for user2
+        assertEq(user2Transactions.length, 1, "User2 should have one transaction");
+    }
 }
