@@ -47,24 +47,33 @@ These contracts are written in Solidity and tested with Foundry framework.
 
 [Foundry install instructions](https://book.getfoundry.sh/getting-started/installation)
 
-
+Once Foundry is installed, it is a good idea to run `foundryup` in connamd line:
 
 ```bash
-npm install @openzeppelin/contracts
+foundryup
 ```
 
-## Testing
+Clone this repo, cd into project folder and run `forge install`:
 
-Remember to write comprehensive test cases to verify the contracts' functionality and security.
+```bash
+git clone ...
+cd Eigenlayer-interview
+forge install
+```
 
-## License
+Run tests:
+```bash
+forge test 
+```
 
-These contracts are released under the MIT License. See the [LICENSE](LICENSE) file for more details.
+To see traces:
+```bash
+forge test -vvvv
+```
+
+
+
 
 ## Contributions
 
 Contributions, issues, and feature requests are welcome!
-
----
-
-Feel free to modify this README to suit the specific details and needs of your repository.
