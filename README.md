@@ -56,7 +56,7 @@ foundryup
 Clone this repo, cd into project folder and run `forge install`:
 
 ```bash
-git clone ...
+git clone https://github.com/sammyshakes/Eigenlayer-interview.git
 cd Eigenlayer-interview
 forge install
 ```
