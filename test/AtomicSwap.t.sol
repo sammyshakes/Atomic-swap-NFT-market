@@ -84,6 +84,11 @@ contract AtomicSwapTest is Test {
         vm.prank(user1);
         atomicSwap.initiateSwap(user2, address(tokenA), address(tokenB), 100, 200);
 
+        // have wrong user attempt to accept the swap
+        vm.prank(user3);
+        vm.expectRevert();
+        atomicSwap.acceptSwap(swapId);
+
         // Accept the swap
         vm.prank(user2);
         atomicSwap.acceptSwap(swapId);
@@ -91,6 +96,12 @@ contract AtomicSwapTest is Test {
         // Verify that the swap is accepted
         AtomicSwap.Swap memory swap = atomicSwap.getSwap(swapId);
         assert(swap.isAccepted);
+
+        // Verify that the tokens are swapped
+        assertEq(tokenA.balanceOf(user1), 0);
+        assertEq(tokenB.balanceOf(user2), 0);
+        assertEq(tokenA.balanceOf(user2), 100);
+        assertEq(tokenB.balanceOf(user1), 200);
     }
 
     //test cancel swap

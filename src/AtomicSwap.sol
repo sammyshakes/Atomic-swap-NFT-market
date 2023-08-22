@@ -3,6 +3,11 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+/**
+ * @title AtomicSwap
+ * @notice A contract for conducting atomic swaps between ERC20 tokens
+ * @dev Supports initiation, acceptance, and cancellation of token swaps
+ */
 contract AtomicSwap {
     struct Swap {
         bool isAccepted;
@@ -32,7 +37,14 @@ contract AtomicSwap {
     );
     event SwapCancelled(uint256 indexed swapId, address indexed userA, uint256 timestamp);
 
-    // User A initiates the swap
+    /**
+     * @notice Initiates a new swap
+     * @param userB The address of User B
+     * @param tokenA The address of token A
+     * @param tokenB The address of token B
+     * @param amountA The amount of token A
+     * @param amountB The amount of token B
+     */
     function initiateSwap(
         address userB,
         address tokenA,
@@ -61,7 +73,16 @@ contract AtomicSwap {
         swaps[swapId] = Swap(false, msg.sender, userB, tokenA, tokenB, amountA, amountB);
     }
 
-    // Repeated swaps need a random salt
+    /**
+     * @notice Initiates a new swap with a unique salt
+     * @param userB The address of User B
+     * @param tokenA The address of token A
+     * @param tokenB The address of token B
+     * @param amountA The amount of token A
+     * @param amountB The amount of token B
+     * @param salt A random salt to ensure uniqueness of swapId
+     * @return swapId The unique identifier of the swap
+     */
     function initiateSwap(
         address userB,
         address tokenA,
@@ -84,15 +105,19 @@ contract AtomicSwap {
         return swapId;
     }
 
-    // User B accepts the swap
+    /**
+     * @notice Accepts an existing swap
+     * @param swapId The unique identifier of the swap
+     */
     function acceptSwap(bytes32 swapId) external {
-        Swap storage swap = swaps[swapId];
+        Swap memory swap = swaps[swapId];
 
         require(swap.userB == msg.sender, "Unauthorized");
         require(swap.isAccepted == false, "Swap already accepted");
 
         // update swap isAccepted, this will prevent reentrancy
         swap.isAccepted = true;
+        swaps[swapId] = swap;
 
         require(
             IERC20(swap.tokenA).transferFrom(swap.userA, msg.sender, swap.amountA),
@@ -106,6 +131,10 @@ contract AtomicSwap {
         emit SwapAccepted(uint256(swapId), swap.userA, swap.userB, block.timestamp);
     }
 
+    /**
+     * @notice Cancels an existing swap by User A
+     * @param swapId The unique identifier of the swap
+     */
     function cancelSwap(bytes32 swapId) public {
         Swap storage swap = swaps[swapId];
         // only userA can cancel the swap
@@ -118,7 +147,11 @@ contract AtomicSwap {
         emit SwapCancelled(uint256(swapId), swap.userA, block.timestamp);
     }
 
-    // view swap details
+    /**
+     * @notice Retrieves details of a specific swap
+     * @param swapId The unique identifier of the swap
+     * @return Swap The swap details
+     */
     function getSwap(bytes32 swapId) external view returns (Swap memory) {
         return swaps[swapId];
     }
