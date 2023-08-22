@@ -71,7 +71,8 @@ To see traces:
 forge test -vvvv
 ```
 
-
+## Notes
+`getUserTransactions` function was added to retrieve any users past purchases and sales. However, it is my opinion this should be done with event indexing. Proper events have been provided to handle this functionality.
 
 
 ## Contributions
