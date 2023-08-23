@@ -51,7 +51,7 @@ contract AtomicSwap {
         address tokenB,
         uint256 amountA,
         uint256 amountB
-    ) external {
+    ) external returns (bytes32) {
         // ensure userA owns the amount of tokenA they want to swap
         require(
             IERC20(tokenA).balanceOf(msg.sender) >= amountA, "User A does not have enough token A"
@@ -71,6 +71,8 @@ contract AtomicSwap {
         );
 
         swaps[swapId] = Swap(false, msg.sender, userB, tokenA, tokenB, amountA, amountB);
+
+        return swapId;
     }
 
     /**
