@@ -1,5 +1,5 @@
 
-# Solidity Contracts Repository for Shakespeare Interview
+# Basic NFTMarket and Atomic Swap Solidity Contracts Repository 
 
 This repository contains two Solidity smart contracts: `NFTMarket` and `AtomicSwap`. These contracts allow for decentralized trading of non-fungible tokens (NFTs) and Atomic swaps of ERC20 tokens, respectively.
 
